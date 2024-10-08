@@ -1093,32 +1093,7 @@ pub mod callsite_fns {
   make_callsite_fn!(get_function, GET_FUNCTION);
   make_callsite_fn!(get_function_name, GET_FUNCTION_NAME);
   make_callsite_fn!(get_method_name, GET_METHOD_NAME);
-
-  pub fn get_file_name(
-    scope: &mut v8::HandleScope<'_>,
-    args: v8::FunctionCallbackArguments<'_>,
-    mut rv: v8::ReturnValue<'_>,
-  ) {
-    let Some(orig) = original_call_site(scope, args.this()) else {
-      return;
-    };
-    // call getFileName
-    let orig_ret =
-      call_method::<v8::Value>(scope, orig, super::GET_FILE_NAME, &[]);
-    if let Some(ret_val) =
-      orig_ret.and_then(|v| v.try_cast::<v8::String>().ok())
-    {
-      // strip off `file://`
-      let string = ret_val.to_rust_string_lossy(scope);
-      if let Some(file_name) = maybe_to_path_str(&string) {
-        let v8_str = crate::FastString::from(file_name).v8_string(scope).into();
-        rv.set(v8_str);
-      } else {
-        rv.set(ret_val.into());
-      }
-    }
-  }
-
+  make_callsite_fn!(get_file_name, GET_FILE_NAME);
   make_callsite_fn!(get_line_number, GET_LINE_NUMBER);
   make_callsite_fn!(get_column_number, GET_COLUMN_NUMBER);
   make_callsite_fn!(get_eval_origin, GET_EVAL_ORIGIN);
